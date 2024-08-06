@@ -1,0 +1,40 @@
+services:
+
+    postgres:
+      image: postgres:16.2-alpine3.19
+      restart: unless-stopped
+      container_name: ama-db
+      ports:
+        - ${AMA_DATABASE_PORT}:5432
+      environment:
+        POSTGRES_USER: ${AMA_DATABASE_USER}
+        POSTGRES_PASSWORD: ${AMA_DATABASE_PASSWORD}
+        POSTGRES_DB: ${AMA_DATABASE_NAME}
+      volumes: 
+        - volume-db:/var/lib/postgresql/data
+      networks:
+        - ama
+
+    # backend:
+    #   build: .
+    #   container_name: ama-backend
+    #   ports: 
+    #     - 8080:8080
+    #   environment:
+    #     AMA_DATABASE_USER: ${AMA_DATABASE_USER}
+    #     AMA_DATABASE_PASSWORD: ${AMA_DATABASE_PASSWORD}
+    #     AMA_DATABASE_HOST: ${AMA_DATABASE_HOST}
+    #     AMA_DATABASE_PORT: ${AMA_DATABASE_PORT}
+    #     AMA_DATABASE_NAME: ${AMA_DATABASE_NAME}
+    #   networks:
+    #     - ama
+    #   depends_on:
+    #     - postgres
+
+networks:
+  ama:
+    driver: bridge
+
+volumes:
+  volume-db:
+    driver: local
