@@ -3,19 +3,16 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log/slog"
 	"net/http"
 	"sync"
 
-	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
-	"github.com/jackc/pgx/v5"
 	"github.com/rodrigomolter/ama-backend/internal/store/pgstore"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/gorilla/websocket"
 )
 
 type apiHandler struct {
@@ -91,7 +88,7 @@ type Message struct {
 	RoomID string `json:"-"`
 }
 
-func (h apiHandler) notifyClient(msg Message) {
+func (h apiHandler) notifyClients(msg Message) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -109,21 +106,8 @@ func (h apiHandler) notifyClient(msg Message) {
 }
 
 func (h apiHandler) handleSubscribe(w http.ResponseWriter, r *http.Request) {
-	rawRoomID := chi.URLParam(r, "room_id")
-	roomID, err := uuid.Parse(rawRoomID)
-	if err != nil {
-		http.Error(w, "invalid room id", http.StatusBadRequest)
-		return
-	}
-
-	_, err = h.q.GetRoom(r.Context(), roomID)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			http.Error(w, "room not found", http.StatusNotFound)
-			return
-		}
-		slog.Error("failed to get room from database", "error", err)
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
+	_, rawRoomID, _, ok := h.readRoom(w, r)
+	if !ok {
 		return
 	}
 
@@ -174,34 +158,14 @@ func (h apiHandler) handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 		ID string `json:"id"`
 	}
 
-	data, err := json.Marshal(response{ID: roomID.String()})
-	if err != nil {
-		slog.Error("failed to parse to json", "error", err)
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(data)
+	sendJSON(w, response{ID: roomID.String()})
 }
 
 func (h apiHandler) handleGetRooms(w http.ResponseWriter, r *http.Request) {}
 
 func (h apiHandler) handleCreateRoomMessage(w http.ResponseWriter, r *http.Request) {
-	rawRoomID := chi.URLParam(r, "room_id")
-	roomID, err := uuid.Parse(rawRoomID)
-	if err != nil {
-		http.Error(w, "invalid room id", http.StatusBadRequest)
-		return
-	}
-
-	_, err = h.q.GetRoom(r.Context(), roomID)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			http.Error(w, "room not found", http.StatusNotFound)
-			return
-		}
-		slog.Error("failed to get room from database", "error", err)
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
+	_, rawRoomID, roomID, ok := h.readRoom(w, r)
+	if !ok {
 		return
 	}
 
@@ -225,16 +189,9 @@ func (h apiHandler) handleCreateRoomMessage(w http.ResponseWriter, r *http.Reque
 		ID string `json:"id"`
 	}
 
-	data, err := json.Marshal(response{ID: messageID.String()})
-	if err != nil {
-		slog.Error("failed to parse to json", "error", err)
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(data)
+	sendJSON(w, response{ID: messageID.String()})
 
-	go h.notifyClient(Message{
+	go h.notifyClients(Message{
 		Kind:   MessageKindMessageCreated,
 		RoomID: rawRoomID,
 		Value: MessageMessageCreated{
