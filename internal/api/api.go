@@ -57,15 +57,19 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 			r.Post("/", a.handleCreateRoom)
 			r.Get("/", a.handleGetRooms)
 
-			r.Route("/{room_id}/messages", func(r chi.Router) {
-				r.Post("/", a.handleCreateRoomMessage)
-				r.Get("/", a.handleGetRoomMessages)
+			r.Route("/{room_id}", func(r chi.Router) {
+				r.Get("/", a.handleGetRoom)
 
-				r.Route("/{message_id}", func(r chi.Router) {
-					r.Get("/", a.handleGetRoomMessage)
-					r.Patch("/react", a.handleReactionToMessage)
-					r.Delete("/react", a.handleRemoveReactionFromMessage)
-					r.Patch("/answer", a.handleMarkMessageAsAnswered)
+				r.Route("/messages", func(r chi.Router) {
+					r.Post("/", a.handleCreateRoomMessage)
+					r.Get("/", a.handleGetRoomMessages)
+
+					r.Route("/{message_id}", func(r chi.Router) {
+						r.Get("/", a.handleGetRoomMessage)
+						r.Patch("/react", a.handleReactionToMessage)
+						r.Delete("/react", a.handleRemoveReactionFromMessage)
+						r.Patch("/answer", a.handleMarkMessageAsAnswered)
+					})
 				})
 			})
 		})
@@ -162,6 +166,15 @@ func (h apiHandler) handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sendJSON(w, response{ID: roomID.String()})
+}
+
+func (h apiHandler) handleGetRoom(w http.ResponseWriter, r *http.Request) {
+	room, _, _, ok := h.readRoom(w, r)
+	if !ok {
+		return
+	}
+
+	sendJSON(w, room)
 }
 
 func (h apiHandler) handleGetRooms(w http.ResponseWriter, r *http.Request) {
