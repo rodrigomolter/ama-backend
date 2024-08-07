@@ -190,12 +190,18 @@ func (h apiHandler) handleGetRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h apiHandler) handleGetRooms(w http.ResponseWriter, r *http.Request) {
-	room, _, _, ok := h.readRoom(w, r)
-	if !ok {
+	rooms, err := h.q.GetRooms(r.Context())
+	if err != nil {
+		slog.Error("failed to get rooms from db", "error", err)
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	sendJSON(w, room)
+	if rooms == nil {
+		rooms = []pgstore.Room{}
+	}
+
+	sendJSON(w, rooms)
 }
 
 func (h apiHandler) handleCreateRoomMessage(w http.ResponseWriter, r *http.Request) {
