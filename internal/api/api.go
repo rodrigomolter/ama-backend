@@ -84,6 +84,7 @@ const (
 	MessageKindMessageCreated          = "message_created"
 	MessageKindMessageRactionIncreased = "message_reaction_increased"
 	MessageKindMessageRactionDecreased = "message_reaction_decreased"
+	MessageKindMessageAnswered         = "message_answered"
 )
 
 type MessageMessageCreated struct {
@@ -99,6 +100,10 @@ type MessageMessageReactionIncreased struct {
 type MessageMessageReactionDecreased struct {
 	ID    string `json:"id"`
 	Count int64  `json:"count"`
+}
+
+type MessageMessageAnswered struct {
+	ID string `json:"id"`
 }
 
 type Message struct {
@@ -360,4 +365,33 @@ func (h apiHandler) handleRemoveReactionFromMessage(w http.ResponseWriter, r *ht
 	})
 }
 
-func (h apiHandler) handleMarkMessageAsAnswered(w http.ResponseWriter, r *http.Request) {}
+func (h apiHandler) handleMarkMessageAsAnswered(w http.ResponseWriter, r *http.Request) {
+	_, rawRoomID, _, ok := h.readRoom(w, r)
+	if !ok {
+		return
+	}
+
+	rawID := chi.URLParam(r, "message_id")
+	id, err := uuid.Parse(rawID)
+	if err != nil {
+		http.Error(w, "invalid message id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.q.MarkMessageAsAnswered(r.Context(), id)
+	if err != nil {
+		slog.Error("failed to persist message as answered", "error", err)
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+	go h.notifyClients(Message{
+		Kind:   MessageKindMessageAnswered,
+		RoomID: rawRoomID,
+		Value: MessageMessageAnswered{
+			ID: rawID,
+		},
+	})
+}
