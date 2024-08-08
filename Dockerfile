@@ -2,6 +2,8 @@ FROM golang:1.22.5-alpine AS builder
 
 WORKDIR /app
 
+ENV ENVIRONMENT="production"
+
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
@@ -13,7 +15,6 @@ FROM scratch
 WORKDIR /app
 
 COPY --from=builder /bin/ama .
-COPY .env ./
 
 EXPOSE ${PORT}
 EXPOSE ${AMA_DATABASE_PORT}
