@@ -15,22 +15,6 @@ services:
       networks:
         - ama
 
-    # backend:
-    #   build: .
-    #   container_name: ama-backend
-    #   ports: 
-    #     - 8080:8080
-    #   environment:
-    #     AMA_DATABASE_USER: ${AMA_DATABASE_USER}
-    #     AMA_DATABASE_PASSWORD: ${AMA_DATABASE_PASSWORD}
-    #     AMA_DATABASE_HOST: ${AMA_DATABASE_HOST}
-    #     AMA_DATABASE_PORT: ${AMA_DATABASE_PORT}
-    #     AMA_DATABASE_NAME: ${AMA_DATABASE_NAME}
-    #   networks:
-    #     - ama
-    #   depends_on:
-    #     - postgres
-
 networks:
   ama:
     driver: bridge
