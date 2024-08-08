@@ -1,5 +1,6 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/f86cffbd-c1e8-4367-9f08-55378decbfdf">
+  
   This **AMA (Ask me Anything)** repository holds the WebServer of the AMA project.
 </div>
 
