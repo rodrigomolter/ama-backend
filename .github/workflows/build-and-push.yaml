@@ -30,8 +30,8 @@ jobs:
         context: .
         push: true
         tags: |
-          rodrigomolter/ama-api:${{ steps.generate_sha.outputs.sha }}
-          rodrigomolter/ama-api:latest
+          rodrigomolter/ama-backend:${{ steps.generate_sha.outputs.sha }}
+          rodrigomolter/ama-backend:latest
 
     # - name: Trigger Deploy
     #   run: |
