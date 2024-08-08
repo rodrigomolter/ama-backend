@@ -1,14 +1,18 @@
 package main
 
 import (
+	"os"
 	"os/exec"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		panic(err)
+	env := os.Getenv("ENVIRONMENT")
+	if env != "production" {
+		if err := godotenv.Load(); err != nil {
+			panic(err)
+		}
 	}
 
 	cmd := exec.Command(
