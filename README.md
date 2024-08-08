@@ -4,7 +4,7 @@
   This **AMA (Ask me Anything)** repository holds the WebServer of the AMA project.
 </div>
 
-# ⁉ Ask me Anything
+# ⁉ AMA | Ask me Anything
 The project consists on creations of **ROOMS** where you can share with your audience in your next AMA Meeting.  
 In the Room, anyone can make questions and upvote others people questions.
 
