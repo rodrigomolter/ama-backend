@@ -2,7 +2,7 @@ services:
 
     postgres:
       image: postgres:16.2-alpine3.19
-      restart: unless-stopped
+      restart: always
       container_name: ama-db
       ports:
         - ${AMA_DATABASE_PORT}:5432
@@ -14,6 +14,39 @@ services:
         - volume-db:/var/lib/postgresql/data
       networks:
         - ama
+
+    backend:
+      build: .
+      container_name: ama-backend
+      restart: always
+      ports: 
+        - ${PORT}:8080
+      environment:
+        - PORT
+        - AMA_DATABASE_USER
+        - AMA_DATABASE_PASSWORD
+        - AMA_DATABASE_HOST
+        - AMA_DATABASE_PORT
+        - AMA_DATABASE_NAME
+      networks:
+        - ama
+      depends_on:
+        - postgres
+
+    web:
+      build: 
+        context: "../ama/"
+      container_name: ama-web
+      restart: always
+      environment:
+        - VITE_APP_BACKEND_ENDPOINT=http://localhost:8080
+        - VITE_APP_WS_ENDPOINT=ws://localhost:8080
+      ports: 
+        - 80:80
+      networks:
+        - ama
+      depends_on:
+        - backend
 
 networks:
   ama:
