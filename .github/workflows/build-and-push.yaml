@@ -33,6 +33,6 @@ jobs:
           rodrigomolter/ama-backend:${{ steps.generate_sha.outputs.sha }}
           rodrigomolter/ama-backend:latest
 
-    # - name: Trigger Deploy
-    #   run: |
-    #     curl ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+    - name: Trigger Deploy
+      run: |
+        curl ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
