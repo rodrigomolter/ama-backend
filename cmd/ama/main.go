@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/rodrigomolter/ama-backend/internal/api"
@@ -23,7 +24,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	pool, err := pgxpool.New(ctx, fmt.Sprintf(
+	config, err := pgxpool.ParseConfig(fmt.Sprintf(
 		"user=%s password=%s host=%s port=%s dbname=%s",
 		os.Getenv("AMA_DATABASE_USER"),
 		os.Getenv("AMA_DATABASE_PASSWORD"),
@@ -31,7 +32,13 @@ func main() {
 		os.Getenv("AMA_DATABASE_PORT"),
 		os.Getenv("AMA_DATABASE_NAME"),
 	))
+	if err != nil {
+		panic(err)
+	}
+	// Solves SQLSTATE 42P05 problem when using supabase in transaction mode as mention here https://github.com/jackc/pgx/issues/1847
+	config.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeCacheDescribe
 
+	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		panic(err)
 	}
