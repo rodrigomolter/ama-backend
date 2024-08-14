@@ -11,7 +11,7 @@ In the Room, anyone can make questions and upvote others people questions.
 It uses `WebSocket` to subscribe to a room and get it updated realtime and handle some problems of race conditions using `mutual exclusion`. 
 
 ## 🖥 FrontEnd
-O frontend foi desenvolvido utilizando `React` e esta disponível no seu próprio repositório
+The frontend of this application was developed using `React` and it's avaiable in its own repository.  
 
 - **[AMA FRONTEND](https://github.com/rodrigomolter/ama)**
 
