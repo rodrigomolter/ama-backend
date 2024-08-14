@@ -25,6 +25,10 @@ Make a copy of the `env.template` file and rename it to `.env`
 Change the variables inside `.env` with the credentials of your database
 
 ## 🏗️ Usage
+First, install all dependecies using `go mod`
+```sh
+go mod tidy
+```
 
 ### 🔄 Migrations
 Currently, the application does not perform `migrations` automatically, meaning you need to run the command to create the tables in the database.
