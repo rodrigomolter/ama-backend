@@ -13,19 +13,19 @@ It uses `WebSocket` to subscribe to a room and get it updated realtime and handl
 ## 🖥 FrontEnd
 The frontend of this application was developed using `React` and it's avaiable in its own repository.  
 
-- **[AMA FRONTEND](https://github.com/rodrigomolter/ama)**
+- **[AMA FRONTEND](https://github.com/rodrigomolter/ama)**.
 
 ## 📋 Pre-requirements
 
-- [Go version 1.22.5](https://go.dev/doc/install)
-- (optional) [Docker](https://docs.docker.com/engine/install/)
+- [Go version 1.22.5](https://go.dev/doc/install);
+- (optional) [Docker](https://docs.docker.com/engine/install/).
 
 ## 🌲 Environment Variables
-Make a copy of the `env.template` file and rename it to `.env`  
-Change the variables inside `.env` with the credentials of your database
+Make a copy of the `env.template` file and rename it to `.env`.  
+Change the variables inside `.env` with the credentials of your database.
 
 ## 🏗️ Usage
-First, install all dependecies using `go mod`
+First, install all dependecies using `go mod`:
 ```sh
 go mod tidy
 ```
@@ -33,15 +33,21 @@ go mod tidy
 ### 🔄 Migrations
 Currently, the application does not perform `migrations` automatically, meaning you need to run the command to create the tables in the database.
 
-> If you are using Docker Compose, this step can be initiated after the container starts.
-
 To run the migrations, simply use `go run`.
 ```sh
 go run cmd/tools/terndotenv/main.go
 ```
+> [!NOTE]
+> To do the migrations, your `database` need already to be up and running.
 
-### 🐋 Docker Compose
-You can start application using `docker-compose`. This will run the `backend`, `frontend` and the `postgres database`
+### ⚙ Go
+Then, you can start the API with the `go run` command:
+```sh
+go run cmd/ama/main.go
+```
+
+## 🐋 Docker Compose
+Alternatively, you can run the application using `docker-compose`. This will run the `backend`, `frontend` and the `postgres database`:
 ```sh
 docker-compose up
 ```
@@ -55,14 +61,16 @@ Make sure you have this [ama-backend](https://github.com/rodrigomolter/ama-backe
     └── docker-compose.yaml
 ```
 
-### ⚙ Go
-Or you can start only the API with the `go run` command
+> [!NOTE]
+> Using Docker, you will also need to manually do the **migrations**!
+
+After the containers are up, run:
 ```sh
-go run cmd/ama/main.go
+go run cmd/tools/terndotenv/main.go
 ```
 
 ## 🔍 Postman 
-You can validate and manually test the API using Postman. Check here the Postman collection
+You can validate and manually test the API using Postman. Check here the Postman collection:
 
 [<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/29423847-510aa0f8-b3a8-4851-beb8-213f69201c2c?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D29423847-510aa0f8-b3a8-4851-beb8-213f69201c2c%26entityType%3Dcollection%26workspaceId%3D634d18e6-9a9f-45a7-a562-69e352023655)
 
