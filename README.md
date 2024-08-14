@@ -18,6 +18,7 @@ The frontend of this application was developed using `React` and it's avaiable i
 ## 📋 Pre-requirements
 
 - [Go version 1.22.5](https://go.dev/doc/install)
+- (optional) [Docker](https://docs.docker.com/engine/install/)
 
 ## 🌲 Environment Variables
 Make a copy of the `env.template` file and rename it to `.env`  
@@ -25,7 +26,7 @@ Change the variables inside `.env` with the credentials of your database
 
 ## 🏗️ Usage
 
-### 🔄 
+### 🔄 Migrations
 Currently, the application does not perform `migrations` automatically, meaning you need to run the command to create the tables in the database.
 
 > If you are using Docker Compose, this step can be initiated after the container starts.
